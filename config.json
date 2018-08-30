@@ -1,0 +1,6 @@
+{
+    "token": "", // do NOT commit this repo with the token here! if you do this, quickly generate a new token.
+    "prefix": "!",
+    "helpMessage": "a work in progress",
+    "errorMessage": "Error: unknown command. Ask 1f1n1ty for a list of what I can do right now."
+}

@@ -8,16 +8,16 @@ const tictac = require("./tictac.js");
 const client = new Discord.Client();
 
 client.on('ready', () => {
-    console.log('Logged in as ${client.user.tag}');
+    console.log(`Logged in as ${client.user.tag}`);
 });
 
 client.on('message', message => {
 
     // Exit if not a bot command
-    if(!msg.content.startsWith(prefix) || message.author.bot) return;
+    if(!message.content.startsWith(config.prefix) || message.author.bot) return;
 
     let terms = message.content.substr(config.prefix.length).trim().split(/ +/g);
-    let command = args.shift().toLowerCase();
+    let command = terms.shift().toLowerCase();
 
     switch (command) {
         // HELP
@@ -40,4 +40,4 @@ client.on('message', message => {
     }
 });
 
-client.login(config.token);
+client.login(config.token); // ERASE THE TOKEN IN CONFIG BEFORE MAKING GIT COMMITS

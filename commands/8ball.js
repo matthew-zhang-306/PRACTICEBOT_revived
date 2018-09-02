@@ -1,5 +1,5 @@
 /*
-EIGHTBALL.JS
+EIGHT BALL
 */
 
 // Intro blurb
@@ -15,8 +15,8 @@ const intro = {
                 "value": "Ask a yes or no question and the magic 8 ball will reveal the answer, but BE WARNED! Knowledge of one's fate seals it. Like, it becomes Kanon."
             },
             {
-                "name": "Usage",
-                "value": "e!8ball [question]"
+                "name": "Commands",
+                "value": "e!8ball [question]: Ask the 8ball a question"
             }
         ]
     }

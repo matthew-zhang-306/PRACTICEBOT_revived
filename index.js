@@ -1,11 +1,21 @@
 const Discord = require("discord.js");
 const config = require("./config.json");
-const fs = require("fs")
-const eightball = require("./eightball.js");
-const tictac = require("./tictac.js");
-
+const fs = require("fs");
 
 const client = new Discord.Client();
+
+// Creates managers for each game in the directory
+let cmds = {};
+fs.readdir(config.commandDir, (err, files) => {
+    if (err) return console.error(err);
+    files.forEach(file => {
+        let func = require(config.commandDir + file);
+        let name = file.split(".")[0];
+        cmds[name] = func;
+    });
+});
+const commands = cmds;
+
 
 client.on('ready', () => {
     console.log(`Logged in as ${client.user.tag}`);
@@ -19,25 +29,20 @@ client.on('message', message => {
     let terms = message.content.substr(config.prefix.length).trim().split(/ +/g);
     let command = terms.shift().toLowerCase();
 
-    switch (command) {
-        // HELP
-        case 'help':
-            message.author.send(config.helpMessage);
-            break;
-        
-        // MAGIC 8 BALL
-        case '8ball':
-            eightball.manageGame(message, terms);
-            break;
-
-        // TIC TAC TOE (or noughts and crosses, for brits)
-        case 'tictac':
-            tictac.manageGame(message, terms);
-            break;
-        
-        default:
-            message.channel.send(config.errorMessage);
+    if (commands == "help") {
+        message.channel.send(config.helpMessage);
     }
+    else if (commands[command] == null || commands[command] == undefined) {
+        message.channel.send(config.errorMessage);
+    }
+    else {
+        try {
+            commands[command].manageGame(message, terms);
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
 });
 
 client.login(config.token); // ERASE THE TOKEN IN CONFIG BEFORE MAKING GIT COMMITS

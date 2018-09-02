@@ -1,5 +1,5 @@
 /*
-TICTAC.JS
+TIC TAC TOE
 */
 
 // Intro blurb
@@ -8,7 +8,7 @@ const listOfCommands =
     "e!tictac play [x] [y]: plays your letter in a certain row and column (and if you are O, you join the game)\n";
 const intro = {
     "embed": {
-        "color": 1649238,
+        "color": 16739179,
         "fields": [
             {
                 "name": "e!tictac",
@@ -44,7 +44,7 @@ var timeOfLastMove = 0;
 // Logic
 let checkIfValidPlay = function(message, terms) {
     if (gameState == GameState.PRE) { // check if game is playing
-        message.channel.send("A game is not currently in progress. Use 'e!tictac new' to start a new game.");
+        message.channel.send("A game is not currently in progress. Use `e!tictac new` to start a new game.");
         return false;
     }
     if (terms.length != 3) { // check if there are exactly 3 terms
@@ -57,13 +57,13 @@ let checkIfValidPlay = function(message, terms) {
     terms[2] = temp;
 
     if (players[1] == null && message.author.tag != players[0]) { // add player 2 if they are joining
-        message.channel.send("@" + message.author.tag + " has been added as Player O.");
+        message.channel.send(`@${message.author.tag} has been added as Player O.`);
         players[1] = message.author.tag;
     }
     if (!players.includes(message.author.tag)) { // check if they are in the game
         console.log(players);
         console.log(message.author.tag);
-        message.channel.send("You are not in the current game. Wait for the game to end and then type e!tictac new");
+        message.channel.send("You are not in the current game. Wait for the game to end and then type `e!tictac new`");
         return false;
     }
     if (players.indexOf(message.author.tag) != turn) { // check if a player is playing out of turn
@@ -120,7 +120,6 @@ let checkBoardState = function(row, col) {
     
     // draw check
     if (b == BoardState.PLAY) {
-        console.log("testing for draw");
         outer: for (var r = 0; r < 3; r++)
             for (var c = 0; c < 3; c++) {
                 if (board[r][c] == " ")
@@ -162,47 +161,50 @@ exports.manageGame = function(message, terms) {
     if (terms.length == 0) { // if no terms, send an introduction
         message.channel.send(intro);
     }
-    else if (terms[0] == "new") {
-        if (gameState == GameState.PLAY && message.createdTimestamp - timeOfLastMove < timeoutTime) {
-            var timeLeft = (timeoutTime - (message.createdTimestamp - timeOfLastMove)) / 1000;
-            message.channel.send("Game in progress. Timeout in " + timeLeft + " seconds.");
-        }
-        else {
-            board = resetBoard();
-            players[0] = message.author.tag;
-            players[1] = null;
-            gameState = GameState.PLAY;
-            turn = 0;
-            message.channel.send("Tic tac toe game started with @" + message.author.tag);
+    else switch (terms[0]) {
+        case "new":
+            if (gameState == GameState.PLAY && message.createdTimestamp - timeOfLastMove < timeoutTime) {
+                var timeLeft = (timeoutTime - (message.createdTimestamp - timeOfLastMove)) / 1000;
+                message.channel.send(`Game in progress. Timeout in ${timeLeft} seconds`);
+            }
+            else {
+                board = resetBoard();
+                players[0] = message.author.tag;
+                players[1] = null;
+                gameState = GameState.PLAY;
+                turn = 0;
+                message.channel.send("Tic tac toe game started with @" + message.author.tag);
+                message.channel.send(printBoard());
+
+                timeOfLastMove = message.createdTimestamp;
+            }
+            
+            break;
+        case "play":
+            if (!checkIfValidPlay(message, terms)) break;
+
+            board[terms[1] - 1][terms[2] - 1] = letters[turn];
+            var boardState = checkBoardState(terms[1] - 1, terms[2] - 1);
+
+            if (boardState == BoardState.PLAY) {
+                turn = (turn + 1) % 2;
+            }
+            else if (boardState == BoardState.WIN) {
+                gameState = GameState.PRE;
+                message.channel.send("@" + players[turn] + " won!");
+            }
+            else if (boardState == BoardState.DRAW) {
+                gameState = GameState.PRE;
+                message.channel.send("It's a tie.");
+            }
+
             message.channel.send(printBoard());
 
             timeOfLastMove = message.createdTimestamp;
-        }
-    }
-    else if (terms[0] == "play") {
-        if (!checkIfValidPlay(message, terms)) return;
 
-        board[terms[1] - 1][terms[2] - 1] = letters[turn];
-        var boardState = checkBoardState(terms[1] - 1, terms[2] - 1);
-
-        if (boardState == BoardState.PLAY) {
-            turn = (turn + 1) % 2;
-        }
-        else if (boardState == BoardState.WIN) {
-            gameState = GameState.PRE;
-            message.channel.send("@" + players[turn] + " won!");
-        }
-        else if (boardState == BoardState.DRAW) {
-            gameState = GameState.PRE;
-            message.channel.send("It's a tie.");
-        }
-
-        message.channel.send(printBoard());
-
-        timeOfLastMove = message.createdTimestamp;
-    }
-    else {
-        message.channel.send(terms[0] + " is not a tic tac toe command. See e!tictac for a list of commands.");
+            break;
+        default:
+            message.channel.send(terms[0] + " is not a tic tac toe command. See e!tictac for a list of commands.");
     }
 
 }

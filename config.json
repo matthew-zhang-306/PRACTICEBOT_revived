@@ -2,5 +2,6 @@
     "token": "",
     "prefix": "e!",
     "helpMessage": "a work in progress",
-    "errorMessage": "Error: unknown command. Ask 1f1n1ty for a list of what I can do right now."
+    "errorMessage": "Error: unknown command. Ask 1f1n1ty for a list of what I can do right now.",
+    "commandDir": "./commands/"
 }
